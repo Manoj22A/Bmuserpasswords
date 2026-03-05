@@ -1,0 +1,18 @@
+{
+  "name": "database-user-viewer",
+  "version": "1.0.0",
+  "description": "Database User Viewer Tool - Node.js + Express",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["database", "viewer", "express"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.5"
+  }
+}
