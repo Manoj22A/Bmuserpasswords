@@ -153,6 +153,25 @@
             font-size: 14px;
         }
 
+        .copy-value {
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-value:hover {
+            color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .copy-password {
+            background-color: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
         tr:hover {
             background-color: #f5f5f5;
         }
@@ -430,6 +449,19 @@
             $('#clearOnlineBtn').on('click', function() {
                 clearOnlineResults();
             });
+
+            $(document).on('click', '.copy-value', function() {
+                var textToCopy = $(this).attr('data-copy-text') || '';
+                var valueLabel = $(this).attr('data-copy-label') || 'Value';
+
+                copyToClipboard(textToCopy)
+                    .then(function() {
+                        showAlert('success', valueLabel + ' copied to clipboard.');
+                    })
+                    .catch(function() {
+                        showAlert('error', 'Unable to copy ' + valueLabel.toLowerCase() + '.');
+                    });
+            });
         });
 
         /**
@@ -565,8 +597,8 @@
 
             $.each(users, function(index, user) {
                 var row = '<tr>' +
-                    '<td>' + escapeHtml(user.username || '') + '</td>' +
-                    '<td><code style="background-color: #f5f5f5; padding: 4px 8px; border-radius: 3px; font-family: monospace; font-size: 12px;">' + escapeHtml(user.password || '') + '</code></td>' +
+                    '<td><span class="copy-value" data-copy-label="Username" data-copy-text="' + escapeHtml(user.username || '') + '">' + escapeHtml(user.username || '') + '</span></td>' +
+                    '<td><code class="copy-value copy-password" data-copy-label="Password" data-copy-text="' + escapeHtml(user.password || '') + '">' + escapeHtml(user.password || '') + '</code></td>' +
                     '</tr>';
                 $tbody.append(row);
             });
@@ -585,8 +617,8 @@
 
             $.each(orders, function(index, order) {
                 var row = '<tr>' +
-                    '<td>' + escapeHtml(order.cci_username || '') + '</td>' +
-                    '<td><code style="background-color: #f5f5f5; padding: 4px 8px; border-radius: 3px; font-family: monospace; font-size: 12px;">' + escapeHtml(order.cci_password || '') + '</code></td>' +
+                    '<td><span class="copy-value" data-copy-label="Username" data-copy-text="' + escapeHtml(order.cci_username || '') + '">' + escapeHtml(order.cci_username || '') + '</span></td>' +
+                    '<td><code class="copy-value copy-password" data-copy-label="Password" data-copy-text="' + escapeHtml(order.cci_password || '') + '">' + escapeHtml(order.cci_password || '') + '</code></td>' +
                     '</tr>';
                 $tbody.append(row);
             });
@@ -622,6 +654,7 @@
          * Show alert message
          */
         function showAlert(type, message) {
+            hideAllAlerts();
             var $alert = $('#' + type + 'Alert');
             $alert.text(message).show();
         }
@@ -684,6 +717,43 @@
         function escapeHtml(text) {
             if (!text) return '';
             return $('<div/>').text(text).html();
+        }
+
+        /**
+         * Copy text to clipboard with fallback support
+         */
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text);
+            }
+
+            return new Promise(function(resolve, reject) {
+                var $temp = $('<textarea>')
+                    .css({
+                        position: 'fixed',
+                        top: '-1000px',
+                        left: '-1000px'
+                    })
+                    .val(text)
+                    .appendTo('body');
+
+                $temp.trigger('focus');
+                $temp.trigger('select');
+
+                try {
+                    var successful = document.execCommand('copy');
+                    $temp.remove();
+
+                    if (successful) {
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                } catch (error) {
+                    $temp.remove();
+                    reject(error);
+                }
+            });
         }
     </script>
 </body>

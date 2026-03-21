@@ -17,6 +17,12 @@ const DB_CONFIG = {
     user: 'testingautomation',
     password: 'IvVq5a1X6pbR61Oc'
 };
+const DB_CONFIG2 = {
+    host: '3.6.71.59',
+    port: 3306,
+    user: 'testingautomation',
+    password: 'IvVq5a1X6pbR61Oc'
+};
 
 // Middleware
 app.use(express.json());
